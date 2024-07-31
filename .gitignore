@@ -7,6 +7,7 @@ node_modules
 
 # foundry files
 /out
+/broadcast
 
 # TypeChain files
 /typechain
