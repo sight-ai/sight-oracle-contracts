@@ -1,0 +1,4 @@
+hardhat/=node_modules/hardhat/
+@openzeppelin/=node_modules/@openzeppelin/
+@sight-ai/=node_modules/@sight-ai/
+forge-std/=lib/forge-std/src/
