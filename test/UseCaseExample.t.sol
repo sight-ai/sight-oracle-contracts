@@ -1,22 +1,14 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {Test, console, Vm} from "forge-std/Test.sol";
+import { Test, console, Vm } from "forge-std/Test.sol";
 import "@sight-ai/contracts/Types.sol";
-import {Oracle} from "@sight-ai/contracts/Oracle.sol";
-import {CapsulatedValue, RequestBuilder} from "@sight-ai/contracts/RequestBuilder.sol";
-import {ReencryptRequestBuilder} from "@sight-ai/contracts/ReencryptRequestBuilder.sol";
-import {UseCaseExample} from "../src/UseCaseExample.sol";
+import { Oracle } from "@sight-ai/contracts/Oracle.sol";
+import { CapsulatedValue, RequestBuilder } from "@sight-ai/contracts/RequestBuilder.sol";
+import { ReencryptRequestBuilder } from "@sight-ai/contracts/ReencryptRequestBuilder.sol";
+import { UseCaseExample } from "../src/UseCaseExample.sol";
 
-interface IOracleEvent {
-    event RequestSent(RequestBuilder.Request);
-    event RequestCallback(bytes32 indexed, bool indexed);
-
-    event ReencryptSent(ReencryptRequestBuilder.ReencryptRequest);
-    event ReencryptCallback(bytes32 indexed, bool indexed);
-}
-
-contract UseCaseExampleTest is Test, IOracleEvent {
+contract UseCaseExampleTest is Test {
     UseCaseExample public example;
     Oracle public oracle;
     bytes32 requestId;

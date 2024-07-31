@@ -51,7 +51,7 @@ contract UseCaseExample {
         op sumACPlus10 = r.add(sumAC, 10);
 
         // Step 7: Compare the result in step 3 with the result in step 6
-        /* op comparisonResult =  */r.gt(sumAB, sumACPlus10);
+        /* op comparisonResult =  */ r.gt(sumAB, sumACPlus10);
 
         r.complete();
 
@@ -60,7 +60,7 @@ contract UseCaseExample {
     }
 
     function callback(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
-        myValue = ResponseResolver.asEbool(results[results.length-1]);
+        myValue = ResponseResolver.asEbool(results[results.length - 1]);
     }
 
     function singleRequest() public {
@@ -71,13 +71,13 @@ contract UseCaseExample {
             this.callback1.selector,
             msg.data
         );
-        /* op result =  */r.rand();
+        /* op result =  */ r.rand();
         r.complete();
         Oracle(oracleAddress).send(r);
     }
 
     function callback1(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
-        myValue1 = ResponseResolver.asEuint64(results[results.length-1]);
+        myValue1 = ResponseResolver.asEuint64(results[results.length - 1]);
     }
 
     function secondRequest() public {
@@ -90,13 +90,13 @@ contract UseCaseExample {
         );
         op op1 = r.getEuint64(myValue1);
         op op2 = r.rand();
-        /* op result =  */r.add(op1, op2);
+        /* op result =  */ r.add(op1, op2);
         r.complete();
         Oracle(oracleAddress).send(r);
     }
 
     function callback2(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
-        myValue2 = ResponseResolver.asEuint64(results[results.length-1]);
+        myValue2 = ResponseResolver.asEuint64(results[results.length - 1]);
     }
 
     fallback() external payable {}

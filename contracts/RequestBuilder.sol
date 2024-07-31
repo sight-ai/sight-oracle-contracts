@@ -6,7 +6,6 @@ import "./Types.sol";
 type op is uint256;
 
 library Opcode {
-
     // Request Context
     uint8 internal constant get_euint64 = 0;
     uint8 internal constant get_ebool = 1;

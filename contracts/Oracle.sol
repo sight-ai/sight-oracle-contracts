@@ -6,7 +6,6 @@ import "./ReencryptRequestBuilder.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 contract Oracle is Ownable2Step {
-
     mapping(bytes32 => RequestBuilder.Request) requests;
     mapping(bytes32 => ReencryptRequestBuilder.ReencryptRequest) reenc_requests;
 
@@ -41,10 +40,7 @@ contract Oracle is Ownable2Step {
         emit ReencryptSent(reen_req);
     }
 
-    function reencryptCallback(
-        bytes32 requestId,
-        bytes memory result
-    ) public onlyOwner {
+    function reencryptCallback(bytes32 requestId, bytes memory result) public onlyOwner {
         ReencryptRequestBuilder.ReencryptRequest memory reen_req = reenc_requests[requestId];
         (bool success, bytes memory bb) = reen_req.callbackAddr.call(
             abi.encodeWithSelector(reen_req.callbackFunc, reen_req.id, result)
