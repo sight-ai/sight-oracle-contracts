@@ -5,214 +5,98 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@sight-ai/contracts/Types.sol";
 import "@sight-ai/contracts/Oracle.sol";
+import "@sight-ai/contracts/RequestBuilder.sol";
+import "@sight-ai/contracts/ReencryptRequestBuilder.sol";
 import "@sight-ai/contracts/ResponseResolver.sol";
 
-enum State {
-    Initial,
-    Launching,
-    Completed
-}
-
-// The FHE Coin Pusher Contract
-contract UseCaseExample is Ownable2Step {
-
-    // Use Sight Oracle's RequestBuilder and ResponseResolver to interact with Sight Oracle
+contract UseCaseExample {
     using RequestBuilder for RequestBuilder.Request;
-    using ResponseResolver for CapsulatedValue;
 
-    event TargetSet(uint64 indexed, uint64 indexed);
-    event Deposit(address indexed, uint64 indexed);
-    event GetTarget(bytes);
-    event RevealTarget(uint64);
-    event GameComplete(address indexed winner, uint64 finalSum);
+    address public oracleAddress;
+    ebool public myValue;
+    euint64 public myValue1;
+    euint64 public myValue2;
 
-    CapsulatedValue private _target;
-    uint64 private _plaintext_target;
-    uint64 private _sum;
-    State private _state;
-    address private _winner;
-    Oracle_Demo27 public oracle;
-
-    mapping(address => uint64) internal balances;
-    mapping(bytes32 => address) requesters;
-    mapping(bytes32 => bytes) requestExtraData;
-
-    constructor(address oracle_) payable Ownable(msg.sender) {
-        _state = State.Initial;
-        oracle = Oracle_Demo27(payable(oracle_));
+    constructor(address _oracleAddress) {
+        oracleAddress = _oracleAddress;
     }
 
-    function setTarget(uint64 min, uint64 max) public payable onlyOwner {
-        require(_state != State.Launching, "Game is not complete!");
-        require(max > min, "require max > min");
-        // clear up
-        _plaintext_target = 0;
-
-        // Initialize new FHE computation request of 3 steps.
+    // This example shows a + b compared with a + c + 10
+    function makeComplicatedRequest() public {
+        // Initialize a new Request with a predefined length for the operations array
         RequestBuilder.Request memory r = RequestBuilder.newRequest(
             msg.sender,
-            3,
+            7, // Adjust this length as needed for gas-efficiency
             address(this),
-            this.setTarget_cb.selector,
-            msg.data[4:]
+            this.callback.selector,
+            msg.data
         );
 
-        uint64 range = max - min + 1;
-        uint64 shards = (type(uint64).max / range + 1);
-
-        // Step 1: generate random value
+        // Step 1: Create EncryptedValue A
         op encryptedValueA = r.rand();
 
-        // Step 2 - 3: limit the random value into range min - max
-        op scaled_random_value = r.div(encryptedValueA, shards);
-        r.add(scaled_random_value, min);
+        // Step 2: Create EncryptedValue B
+        op encryptedValueB = r.rand();
 
-        // Call request.complete() to complete build process
+        // Step 3: Add A and B to get the result
+        op sumAB = r.add(encryptedValueA, encryptedValueB);
+
+        // Step 4: Create EncryptedValue C
+        op encryptedValueC = r.rand();
+
+        // Step 5: Add A and C
+        op sumAC = r.add(encryptedValueA, encryptedValueC);
+
+        // Step 6: Add result in step 5 with plaintext 10
+        op sumACPlus10 = r.add(sumAC, 10);
+
+        // Step 7: Compare the result in step 3 with the result in step 6
+        /* op comparisonResult =  */r.gt(sumAB, sumACPlus10);
+
         r.complete();
 
-        // Keep some context in local storage
-        requestExtraData[r.id] = msg.data[4:];
-        requesters[r.id] = msg.sender;
-
-        // Send the request via Sight FHE Oracle
-        oracle.send(r);
+        // Send the request to the Oracle
+        Oracle(oracleAddress).send(r);
     }
 
-    // only Oracle can call this
-    function setTarget_cb(bytes32 requestId, CapsulatedValue[] memory EVs) public onlyOracle {
-        // Load context from local storage
-        bytes memory extraData = requestExtraData[requestId];
-        (uint64 min, uint64 max) = abi.decode(extraData, (uint64, uint64));
-
-        // Decode value from Oracle callback
-        CapsulatedValue memory final_result = EVs[EVs.length - 1];
-
-        // Keep this encrypted target value
-        _target = final_result;
-
-        // initialize status
-        _winner = address(0);
-        _sum = 0;
-        _state = State.Launching;
-
-        emit TargetSet(min, max);
+    function callback(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
+        myValue = ResponseResolver.asEbool(results[results.length-1]);
     }
 
-    function deposit(uint64 amount) public {
-        require(_state == State.Launching, "Game not launching or Game already Completed.");
-
-        // Initialize new FHE computation request of 3 steps.
+    function singleRequest() public {
         RequestBuilder.Request memory r = RequestBuilder.newRequest(
             msg.sender,
-            3,
+            1, // Adjust this length as needed for gas-efficiency
             address(this),
-            this.deposit_cb.selector,
-            abi.encode(msg.sender, amount)
+            this.callback1.selector,
+            msg.data
         );
-        uint64 balance_after = balances[msg.sender] + amount;
-
-        // Step 1: load local stored encrypted target into request processing context
-        op e_target = r.getEuint64(_target.asEuint64());
-
-        // Step 2: compare balance and encrypted_target
-        op e_greater = r.ge(balance_after, e_target);
-
-        // Step 3: decrypt the comparison result, it is safe to reveal
-        r.decryptEbool(e_greater);
-
-        // complete the request
+        /* op result =  */r.rand();
         r.complete();
-
-        requestExtraData[r.id] = abi.encode(msg.sender, amount);
-        // send request to Sight FHE Oracle
-        oracle.send(r);
+        Oracle(oracleAddress).send(r);
     }
 
-
-    // only Oracle can call this
-    function deposit_cb(bytes32 requestId, CapsulatedValue[] memory EVs) public onlyOracle {
-        bytes memory extraData = requestExtraData[requestId];
-        (address requester, uint64 amount) = abi.decode(extraData, (address, uint64));
-        // CapsulatedValue 0: the encrypted target
-        // CapsulatedValue 1: the encrypted compare result
-        // CapsulatedValue 2: the decrypted compare result, as used here
-        CapsulatedValue memory final_result = EVs[EVs.length - 1];
-        balances[requester] += amount;
-        _sum += amount;
-        emit Deposit(requester, amount);
-
-        // Check winning condition
-        bool isWinner = final_result.asBool();
-        if (isWinner) {
-            _winner = requester;
-            _state = State.Completed;
-            emit GameComplete(_winner, _sum);
-        }
+    function callback1(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
+        myValue1 = ResponseResolver.asEuint64(results[results.length-1]);
     }
 
-
-    // Reveal the target
-    function revealTarget() public {
-        require(_state == State.Completed, "Game is not complete!");
-
-        // Initialize new FHE computation request of 2 steps.
+    function secondRequest() public {
         RequestBuilder.Request memory r = RequestBuilder.newRequest(
             msg.sender,
-            2,
+            3, // Adjust this length as needed for gas-efficiency
             address(this),
-            this.revealTarget_cb.selector,
-            ""
+            this.callback2.selector,
+            msg.data
         );
-
-        // Step 1: load encrypted target into processing context
-        op e_target = r.getEuint64(_target.asEuint64());
-
-        // Step 2: decrypt the target
-        r.decryptEuint64(e_target);
-
+        op op1 = r.getEuint64(myValue1);
+        op op2 = r.rand();
+        /* op result =  */r.add(op1, op2);
         r.complete();
-
-        oracle.send(r);
+        Oracle(oracleAddress).send(r);
     }
 
-    // only Oracle can call this
-    function revealTarget_cb(bytes32 requestId, CapsulatedValue[] memory EVs) public onlyOracle {
-        CapsulatedValue memory final_result = EVs[EVs.length - 1];
-
-        // unwrap the plaintext value
-        uint64 target = final_result.asUint64();
-
-        _plaintext_target = target;
-        emit RevealTarget(target);
-    }
-
-    modifier onlyOracle() {
-        require(msg.sender == address(oracle), "Only Oracle Can Do This");
-        _;
-    }
-
-    function isComplete() public view returns (bool) {
-        return _state == State.Completed;
-    }
-
-    function winner() public view returns (address) {
-        return _winner;
-    }
-
-    function sum() public view returns (uint64) {
-        return _sum;
-    }
-
-    function myBalance() public view returns (uint64) {
-        return balances[msg.sender];
-    }
-
-    function getTarget() public view returns (uint64) {
-        return _plaintext_target;
-    }
-
-    function gameState() public view returns (State) {
-        return _state;
+    function callback2(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
+        myValue2 = ResponseResolver.asEuint64(results[results.length-1]);
     }
 
     fallback() external payable {}
