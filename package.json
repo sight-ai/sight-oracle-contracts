@@ -1,14 +1,25 @@
 {
 	"name": "fhe-oracle",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "Sight AI FHE Oracle Project.",
+  "keywords": [
+    "solidity",
+    "fhe",
+    "oracle"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sight-ai/fhe-oracle.git"
+  },
+  "author": "Sight AI <arthur@sightai.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sight-ai/fhe-oracle/issues"
+  },
+  "homepage": "https://sightai.io",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"devDependencies": {
 		"@nomicfoundation/hardhat-ignition": "^0.15.0",
 		"@nomicfoundation/hardhat-ignition-viem": "^0.15.0",
