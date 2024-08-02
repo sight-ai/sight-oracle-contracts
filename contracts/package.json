@@ -1,17 +1,28 @@
 {
-  "name": "@sight-ai/contracts",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "name": "@sight-oracle/contracts",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "Sight AI FHE Oracle Project.",
   "keywords": [
     "solidity",
     "fhe",
     "oracle"
   ],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sight-ai/fhe-oracle.git"
+  },
+  "author": "Sight AI <arthur@sightai.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sight-ai/fhe-oracle/issues"
+  },
+  "homepage": "https://sightai.io",
+  "files": [
+    "**/*.sol"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2"
   }
