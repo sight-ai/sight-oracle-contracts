@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://github.com/sight-ai/fhe-oracle.git"
   },
-  "author": "Sight AI <arthur@sightai.io>",
+  "author": "arthur@sightai.io",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sight-ai/fhe-oracle/issues"
@@ -22,8 +22,5 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
   }
 }
