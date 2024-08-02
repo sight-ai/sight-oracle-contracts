@@ -3,7 +3,7 @@
 ## install sight ai oracle contracts as dependency in your repository.
 
 ```shell
-pnpm i -D "@sight-ai/contracts@github:sight-ai/fhe-oracle#v0.0.1&path:contracts"
+pnpm i -D "@sight-ai/contracts@github:sight-ai/fhe-oracle#v0.0.1-SNAPSHOT&path:contracts"
 ```
 
 ## test oracle contract
