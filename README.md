@@ -1,18 +1,22 @@
-# Sight Ai Oracle Project
+# Sight Oracle Contracts
 
-## install sight ai oracle contracts as dependency in your repository.
-
+## Installation
+### Hardhat (npm)
 ```shell
-pnpm i -D "@sight-ai/contracts@github:sight-ai/fhe-oracle#v0.0.1-SNAPSHOT&path:contracts"
+npm install @sight-oracle/contracts
 ```
 
-## test oracle contract
+## Test
 
 ```shell
 pnpm hardhat test # or
 forge test -vv
 ```
 
-## read our [template](https://github.com/sight-ai/fhe-hardhat-template) to learn how to use it.
+## Example
 
-## supported operations in library RequestBuilder at _`contracts/Oracle/RequestBuilder.sol`_
+Checkout our [example](https://github.com/sight-ai/sight-oracle-contract-example-hardhat) to learn how to use Sight Oracle to build your own contract.
+
+## Suppoted op_codes
+Please see _`contracts/Oracle/RequestBuilder.sol`_
+
