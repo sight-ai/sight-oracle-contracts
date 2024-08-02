@@ -1,4 +1,4 @@
-name: test
+name: codecov
 
 on: workflow_dispatch
 
@@ -32,3 +32,14 @@ jobs:
         run: |
           forge test -vvv
         id: test
+
+      - name: Run Forge coverage
+        run: |
+          env COVERAGE=true FOUNDRY_FUZZ_RUNS=10 forge coverage --report lcov --ir-minimum
+          sed -i '/,0/d' lcov.info
+        id: coverage
+
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v4.2.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
