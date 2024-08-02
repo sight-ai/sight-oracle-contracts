@@ -17,6 +17,6 @@ forge test -vv
 
 Checkout our [example](https://github.com/sight-ai/sight-oracle-contract-example-hardhat) to learn how to use Sight Oracle to build your own contract.
 
-## Suppoted op_codes
+## Supported op_codes
 Please see _`contracts/Oracle/RequestBuilder.sol`_
 
