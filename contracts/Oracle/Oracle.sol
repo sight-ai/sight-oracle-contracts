@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./RequestBuilder.sol";
 import "./ReencryptRequestBuilder.sol";
-import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "./access/Ownable2Step.sol";
 
 contract Oracle is Ownable2Step {
     mapping(bytes32 => RequestBuilder.Request) requests;
@@ -14,8 +14,6 @@ contract Oracle is Ownable2Step {
 
     event ReencryptSent(ReencryptRequestBuilder.ReencryptRequest);
     event ReencryptCallback(bytes32 indexed, bool indexed);
-
-    constructor() Ownable(msg.sender) {}
 
     function send(RequestBuilder.Request calldata request) external {
         require(request.id != bytes32(0), "id not generated, use .complete()");
