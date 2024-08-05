@@ -21,3 +21,4 @@ node_modules
 ignition/deployments/chain-31337
 
 pnpm-lock.yaml
+package-lock.json
