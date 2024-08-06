@@ -1,5 +1,5 @@
 {
-  "name": "fhe-oracle",
+  "name": "sight-oracle-contracts",
   "version": "0.0.1-SNAPSHOT",
   "description": "Sight AI FHE Oracle Project.",
   "keywords": [
@@ -50,6 +50,7 @@
     "hardhat-gas-reporter": "^1.0.8",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.3.1",
+    "rimraf": "^6.0.1",
     "solhint": "^5.0.3",
     "solidity-coverage": "^0.8.0",
     "ts-node": ">=8.0.0",
