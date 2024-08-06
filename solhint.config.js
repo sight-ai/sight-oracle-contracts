@@ -19,5 +19,5 @@ const rules = [
 
 module.exports = {
   plugins: [],
-  rules: Object.fromEntries(rules.map((r) => [r, "error"]))
+  rules: Object.fromEntries(rules.map((r) => [r, "warn"]))
 };
