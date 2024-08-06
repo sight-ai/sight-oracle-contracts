@@ -14,7 +14,7 @@ describe("Oracle", function () {
       oracle,
       owner,
       otherAccount,
-      publicClient,
+      publicClient
     };
   }
 

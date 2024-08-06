@@ -1,0 +1,26 @@
+coverage:
+  status:
+    project: off
+    patch: off
+
+comment:
+  layout: "condensed_header, diff, flags, components"
+
+component_management:
+  individual_components:
+    - component_id: oracle
+      name: oracle
+      paths:
+        - contracts/Oracle/
+
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: contracts
+      paths:
+        - contracts/
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
