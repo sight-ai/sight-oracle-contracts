@@ -22,6 +22,3 @@ ignition/deployments/chain-31337
 
 pnpm-lock.yaml
 package-lock.json
-
-.nx/cache
-.nx/workspace-data
