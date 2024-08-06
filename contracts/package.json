@@ -9,18 +9,20 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/sight-ai/fhe-oracle.git"
+    "url": "https://github.com/sight-ai/sight-oracle-contracts.git"
   },
   "author": "arthur@sightai.io",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sight-ai/fhe-oracle/issues"
+    "url": "https://github.com/sight-ai/sight-oracle-contracts/issues"
   },
   "homepage": "https://sightai.io",
   "files": [
     "**/*.sol"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "forge build --sizes",
+    "compile": "forge compile",
+    "fmt": "forge fmt"
   }
 }
