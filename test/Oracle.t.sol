@@ -4,12 +4,13 @@ pragma solidity ^0.8.13;
 import { Test, console, Vm } from "forge-std/Test.sol";
 import "../contracts/Oracle/Types.sol";
 import { Oracle } from "../contracts/Oracle/Oracle.sol";
-import { CapsulatedValue, RequestBuilder } from "../contracts/Oracle/RequestBuilder.sol";
+import { CapsulatedValue, Request } from "../contracts/Oracle/Types.sol";
+import { RequestBuilder } from "../contracts/Oracle/RequestBuilder.sol";
 import { ResponseResolver } from "../contracts/Oracle/ResponseResolver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract UseCaseExample {
-    using RequestBuilder for RequestBuilder.Request;
+    using RequestBuilder for Request;
 
     address public oracleAddress;
     euint64 public myValue;
@@ -19,7 +20,7 @@ contract UseCaseExample {
     }
 
     function singleRequest() public {
-        RequestBuilder.Request memory r = RequestBuilder.newRequest(
+        Request memory r = RequestBuilder.newRequest(
             msg.sender,
             1, // Adjust this length as needed for gas-efficiency
             address(this),
@@ -27,7 +28,6 @@ contract UseCaseExample {
             msg.data
         );
         /* op result =  */ r.rand();
-        r.complete();
         Oracle(oracleAddress).send(r);
     }
 
@@ -50,8 +50,8 @@ contract OracleTest is Test {
     }
 
     function test_singleRequest() public {
-        RequestBuilder.Operation[] memory ops = new RequestBuilder.Operation[](0);
-        RequestBuilder.Request memory fake_req = RequestBuilder.Request(
+        Operation[] memory ops = new Operation[](0);
+        Request memory fake_req = Request(
             bytes32(""),
             address(this),
             ops,
@@ -65,7 +65,7 @@ contract OracleTest is Test {
         vm.recordLogs();
         example.singleRequest();
         Vm.Log[] memory entries = vm.getRecordedLogs();
-        RequestBuilder.Request memory req = abi.decode(entries[entries.length - 1].data, (RequestBuilder.Request)); // parse event params.
+        Request memory req = abi.decode(entries[entries.length - 1].data, (Request)); // parse event params.
         requestId = req.id;
         console.log("singleRequest's id: %s", Strings.toHexString(uint256(requestId), 32));
         CapsulatedValue[] memory results = new CapsulatedValue[](1);

@@ -1,7 +1,8 @@
 {
   "name": "@sight-oracle/contracts",
-  "version": "0.0.1-SNAPSHOT",
+  "version": "0.0.2-SNAPSHOT",
   "description": "Sight AI FHE Oracle Project.",
+  "main": "./dist/index.js",
   "keywords": [
     "solidity",
     "fhe",
@@ -18,9 +19,14 @@
   },
   "homepage": "https://sightai.io",
   "files": [
-    "**/*.sol"
+    "**/*.sol",
+    "dist/**/*.ts",
+    "dist/**/*.js"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
   }
 }
