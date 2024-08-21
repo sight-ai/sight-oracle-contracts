@@ -29,7 +29,17 @@ contract Oracle is Ownable2Step {
 
     function send(Request memory request) external returns (bytes32) {
         request.id = keccak256(abi.encodePacked(nonce++, request.requester, block.number));
-        requests[request.id] = request;
+        Request storage req = requests[request.id];
+        req.id = request.id;
+        req.requester = request.requester;
+        req.opsCursor = request.opsCursor;
+        req.callbackAddr = request.callbackAddr;
+        req.callbackFunc = request.callbackFunc;
+        req.payload = request.payload;
+        Operation[] storage ops = req.ops;
+        for (uint256 i; i < request.ops.length; i++) {
+            ops.push(request.ops[i]);
+        }
         emit RequestSent(request);
         return request.id;
     }
