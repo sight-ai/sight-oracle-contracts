@@ -19,7 +19,7 @@
   "homepage": "https://sightai.io",
   "scripts": {
     "compile": "hardhat compile",
-    "coverage": "hardhat coverage",
+    "coverage": "env SOLIDITY_COVERAGE=true hardhat coverage",
     "lint": "pnpm run lint:js && pnpm run lint:sol",
     "lint:fix": "pnpm run lint:js:fix && pnpm run lint:sol:fix",
     "lint:js": "prettier --log-level warn --ignore-path .gitignore '**/*.{js,ts}' --check && eslint --no-error-on-unmatched-pattern --ignore-path .gitignore .",
