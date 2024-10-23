@@ -14,8 +14,6 @@ library ReencryptRequestBuilder {
     ) internal pure returns (ReencryptRequest memory) {
         require(target.valueType != 0, "not initialized data");
         ReencryptRequest memory r = ReencryptRequest({
-            // id shall remain the same since all encrypted data are immutable
-            id: keccak256(abi.encodePacked(requester, target.data, target.valueType, publicKey, signature)),
             requester: requester,
             target: target,
             publicKey: publicKey,

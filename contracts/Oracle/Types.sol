@@ -23,7 +23,6 @@ struct Operation {
 }
 
 struct Request {
-    bytes32 id;
     address requester;
     Operation[] ops;
     uint256 opsCursor;
@@ -33,7 +32,6 @@ struct Request {
 }
 
 struct ReencryptRequest {
-    bytes32 id;
     address requester;
     CapsulatedValue target;
     bytes32 publicKey;
@@ -43,7 +41,6 @@ struct ReencryptRequest {
 }
 
 struct SaveCiphertextRequest {
-    bytes32 id;
     address requester;
     bytes ciphertext;
     uint8 ciphertextType;
