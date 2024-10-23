@@ -12,7 +12,6 @@ library SaveCiphertextRequestBuilder {
         bytes4 callbackFunc
     ) internal pure returns (SaveCiphertextRequest memory) {
         SaveCiphertextRequest memory r = SaveCiphertextRequest({
-            id: keccak256(abi.encodePacked(requester, callbackAddr, ciphertextType, callbackFunc)),
             requester: requester,
             ciphertext: ciphertext,
             ciphertextType: ciphertextType,

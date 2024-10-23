@@ -19,7 +19,7 @@ contract UseCaseExample {
         oracleAddress = _oracleAddress;
     }
 
-    function singleRequest() public {
+    function singleRequest() public returns (bytes32) {
         Request memory r = RequestBuilder.newRequest(
             msg.sender,
             1, // Adjust this length as needed for gas-efficiency
@@ -28,7 +28,7 @@ contract UseCaseExample {
             msg.data
         );
         /* op result =  */ r.rand();
-        Oracle(oracleAddress).send(r);
+        return Oracle(oracleAddress).send(r);
     }
 
     function callback(bytes32 /* requestId */, CapsulatedValue[] memory results) public {
@@ -52,7 +52,6 @@ contract OracleTest is Test {
     function test_singleRequest() public {
         Operation[] memory ops = new Operation[](0);
         Request memory fake_req = Request(
-            bytes32(""),
             address(this),
             ops,
             1,
@@ -60,13 +59,10 @@ contract OracleTest is Test {
             example.callback.selector,
             bytes("")
         );
-        vm.expectEmit(true, true, true, false, address(oracle));
-        emit Oracle.RequestSent(fake_req);
+        vm.expectEmit(false, true, true, false, address(oracle));
+        emit Oracle.RequestSent("", fake_req);
         vm.recordLogs();
-        example.singleRequest();
-        Vm.Log[] memory entries = vm.getRecordedLogs();
-        Request memory req = abi.decode(entries[entries.length - 1].data, (Request)); // parse event params.
-        requestId = req.id;
+        requestId = example.singleRequest();
         console.log("singleRequest's id: %s", Strings.toHexString(uint256(requestId), 32));
         CapsulatedValue[] memory results = new CapsulatedValue[](1);
         results[0] = CapsulatedValue(0, 129);

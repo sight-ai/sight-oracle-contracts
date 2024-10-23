@@ -13,7 +13,6 @@ library RequestBuilder {
     ) internal pure returns (Request memory) {
         Operation[] memory ops = new Operation[](opsLength);
         Request memory r = Request({
-            id: bytes32(0),
             requester: requester,
             ops: ops,
             opsCursor: 0,
@@ -32,7 +31,6 @@ library RequestBuilder {
     ) internal pure returns (Request memory) {
         Operation[] memory ops = new Operation[](opsLength);
         Request memory r = Request({
-            id: bytes32(0),
             requester: requester,
             ops: ops,
             opsCursor: 0,
