@@ -826,7 +826,6 @@ library RequestBuilder {
 
     // decrypt euint64 async
     function decryptEuint64Async(Request memory r, op index) internal pure returns (op) {
-        require(r.opsCursor + 1 == r.ops.length, "Async Operation Need To Be The Latest.");
         Operation memory _op = Operation({
             opcode: Opcode.decrypt_euint64_async,
             operands: new uint256[](1),
@@ -842,7 +841,6 @@ library RequestBuilder {
 
     // decrypt ebool async
     function decryptEboolAsync(Request memory r, op index) internal pure returns (op) {
-        require(r.opsCursor + 1 == r.ops.length, "Async Operation Need To Be The Latest.");
         Operation memory _op = Operation({ opcode: Opcode.decrypt_ebool_async, operands: new uint256[](1), value: 0 });
         _op.operands[0] = op.unwrap(index);
 
@@ -854,7 +852,6 @@ library RequestBuilder {
 
     // decrypt eaddress async
     function decryptEaddressAsync(Request memory r, op index) internal pure returns (op) {
-        require(r.opsCursor + 1 == r.ops.length, "Async Operation Need To Be The Latest.");
         Operation memory _op = Operation({
             opcode: Opcode.decrypt_eaddress_async,
             operands: new uint256[](1),
