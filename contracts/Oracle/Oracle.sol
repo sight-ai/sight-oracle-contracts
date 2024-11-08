@@ -24,7 +24,7 @@ contract Oracle is Ownable2Step, Reencrypt {
     event SaveCiphertextSent(bytes32 indexed reqId, SaveCiphertextRequest req);
     event SaveCiphertextCallback(bytes32 indexed reqId, bool indexed success);
 
-    string public constant VERSION = "0.0.3-SNAPSHOT";
+    string public constant VERSION = "0.0.3";
 
     uint256 private nonce;
     mapping(address => uint8) private callers;

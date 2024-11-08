@@ -46,6 +46,9 @@ contract OracleTest is Test {
 
     function setUp() public {
         oracle = new Oracle();
+        address[] memory callers = new address[](1);
+        callers[0] = address(this);
+        oracle.addCallers(callers);
         example = new UseCaseExample(address(oracle));
     }
 
