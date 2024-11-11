@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "./Reencrypt.sol";
 import "./RequestBuilder.sol";
 import "./ReencryptRequestBuilder.sol";
 import "./SaveCiphertextRequestBuilder.sol";
@@ -9,7 +10,7 @@ import "./constants/OracleAddresses.sol";
 
 Oracle constant oracleOpSepolia = Oracle(ORACLE_ADDR_OP_SEPOLIA);
 
-contract Oracle is Ownable2Step {
+contract Oracle is Ownable2Step, Reencrypt {
     mapping(bytes32 => Request) requests;
     mapping(bytes32 => ReencryptRequest) reenc_requests;
     mapping(bytes32 => SaveCiphertextRequest) save_ciphertext_requests;
@@ -23,9 +24,10 @@ contract Oracle is Ownable2Step {
     event SaveCiphertextSent(bytes32 indexed reqId, SaveCiphertextRequest req);
     event SaveCiphertextCallback(bytes32 indexed reqId, bool indexed success);
 
-    string public constant VERSION = "0.0.3-SNAPSHOT";
+    string public constant VERSION = "0.0.3";
 
     uint256 private nonce;
+    mapping(address => uint8) private callers;
 
     function send(Request memory req) external returns (bytes32) {
         bytes32 reqId = keccak256(abi.encodePacked(nonce++, req.requester, block.number));
@@ -43,7 +45,7 @@ contract Oracle is Ownable2Step {
         return reqId;
     }
 
-    function callback(bytes32 reqId, CapsulatedValue[] memory result) public onlyOwner {
+    function callback(bytes32 reqId, CapsulatedValue[] memory result) public onlyCallers {
         Request memory req = requests[reqId];
         (bool success, bytes memory bb) = req.callbackAddr.call(
             abi.encodeWithSelector(req.callbackFunc, reqId, result)
@@ -55,14 +57,16 @@ contract Oracle is Ownable2Step {
         emit RequestCallback(reqId, success);
     }
 
-    function send(ReencryptRequest memory req) public returns (bytes32) {
+    function send(
+        ReencryptRequest memory req
+    ) public onlySignedPublicKey(req.publicKey, req.signature) returns (bytes32) {
         bytes32 reqId = keccak256(abi.encodePacked(nonce++, req.requester, block.number));
         reenc_requests[reqId] = req;
         emit ReencryptSent(reqId, req);
         return reqId;
     }
 
-    function reencryptCallback(bytes32 reqId, bytes memory result) public onlyOwner {
+    function reencryptCallback(bytes32 reqId, bytes memory result) public onlyCallers {
         ReencryptRequest memory req = reenc_requests[reqId];
         (bool success, bytes memory bb) = req.callbackAddr.call(
             abi.encodeWithSelector(req.callbackFunc, reqId, result)
@@ -82,7 +86,7 @@ contract Oracle is Ownable2Step {
         return reqId;
     }
 
-    function saveCiphertextCallback(bytes32 reqId, CapsulatedValue memory result) public onlyOwner {
+    function saveCiphertextCallback(bytes32 reqId, CapsulatedValue memory result) public onlyCallers {
         SaveCiphertextRequest memory req = save_ciphertext_requests[reqId];
         (bool success, bytes memory bb) = req.callbackAddr.call(
             abi.encodeWithSelector(req.callbackFunc, reqId, result)
@@ -92,5 +96,22 @@ contract Oracle is Ownable2Step {
             revert(err);
         }
         emit SaveCiphertextCallback(reqId, success);
+    }
+
+    function addCallers(address[] memory _callers) public onlyOwner {
+        for (uint8 i; i < _callers.length; i++) {
+            callers[_callers[i]] = 1;
+        }
+    }
+
+    function deleteCallers(address[] memory _callers) public onlyOwner {
+        for (uint8 i; i < _callers.length; i++) {
+            delete callers[_callers[i]];
+        }
+    }
+
+    modifier onlyCallers() {
+        require(callers[msg.sender] == 1, "Sender Not In The Callers.");
+        _;
     }
 }
