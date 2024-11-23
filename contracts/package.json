@@ -1,6 +1,6 @@
 {
   "name": "@sight-oracle/contracts",
-  "version": "0.0.3",
+  "version": "0.0.3-rc1",
   "description": "Sight AI FHE Oracle Project.",
   "main": "./dist/index.js",
   "keywords": [
