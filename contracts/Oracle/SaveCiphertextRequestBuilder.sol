@@ -8,6 +8,7 @@ library SaveCiphertextRequestBuilder {
         address requester,
         bytes calldata ciphertext,
         uint8 ciphertextType,
+        address oracleAddr,
         address callbackAddr,
         bytes4 callbackFunc
     ) internal pure returns (SaveCiphertextRequest memory) {
@@ -15,6 +16,7 @@ library SaveCiphertextRequestBuilder {
             requester: requester,
             ciphertext: ciphertext,
             ciphertextType: ciphertextType,
+            oracleAddr: oracleAddr,
             callbackAddr: callbackAddr,
             callbackFunc: callbackFunc
         });
