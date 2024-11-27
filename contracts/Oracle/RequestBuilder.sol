@@ -8,7 +8,6 @@ library RequestBuilder {
     function newRequest(
         address requester,
         uint256 opsLength,
-        address oracleAddr,
         address callbackAddr,
         bytes4 callbackFunc,
         bytes memory payload
@@ -18,7 +17,6 @@ library RequestBuilder {
             requester: requester,
             ops: ops,
             opsCursor: 0,
-            oracleAddr: oracleAddr,
             callbackAddr: callbackAddr,
             callbackFunc: callbackFunc,
             payload: payload
@@ -29,7 +27,6 @@ library RequestBuilder {
     function newRequest(
         address requester,
         uint256 opsLength,
-        address oracleAddr,
         address callbackAddr,
         bytes4 callbackFunc
     ) internal pure returns (Request memory) {
@@ -38,7 +35,6 @@ library RequestBuilder {
             requester: requester,
             ops: ops,
             opsCursor: 0,
-            oracleAddr: oracleAddr,
             callbackAddr: callbackAddr,
             callbackFunc: callbackFunc,
             payload: ""
@@ -47,9 +43,8 @@ library RequestBuilder {
     }
 
     // load an encrypted value into the execution context
-    function getEbool(Request memory r, ebool input) internal view returns (op) {
+    function getEbool(Request memory r, ebool input) internal pure returns (op) {
         require(r.opsCursor < r.ops.length, "Operations array is full");
-        require(Oracle(r.oracleAddr).isOwnedEbool(msg.sender, input), "sender not own data");
         Operation memory _op = Operation({ opcode: Opcode.get_ebool, operands: new uint256[](1), value: 0 });
         _op.operands[0] = ebool.unwrap(input);
 
@@ -59,9 +54,8 @@ library RequestBuilder {
         return op.wrap(r.opsCursor - 1);
     }
 
-    function getEaddress(Request memory r, eaddress input) internal view returns (op) {
+    function getEaddress(Request memory r, eaddress input) internal pure returns (op) {
         require(r.opsCursor < r.ops.length, "Operations array is full");
-        require(Oracle(r.oracleAddr).isOwnedEaddress(msg.sender, input), "sender not own data");
         Operation memory _op = Operation({ opcode: Opcode.get_eaddress, operands: new uint256[](1), value: 0 });
         _op.operands[0] = eaddress.unwrap(input);
 
@@ -71,9 +65,8 @@ library RequestBuilder {
         return op.wrap(r.opsCursor - 1);
     }
 
-    function getEuint64(Request memory r, euint64 input) internal view returns (op) {
+    function getEuint64(Request memory r, euint64 input) internal pure returns (op) {
         require(r.opsCursor < r.ops.length, "Operations array is full");
-        require(Oracle(r.oracleAddr).isOwnedEuint64(msg.sender, input), "sender not own data");
         Operation memory _op = Operation({ opcode: Opcode.get_euint64, operands: new uint256[](1), value: 0 });
         _op.operands[0] = euint64.unwrap(input);
 

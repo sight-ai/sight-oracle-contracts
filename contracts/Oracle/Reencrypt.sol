@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: BSD-3-Clause-Clear
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import "./utils/cryptography/ECDSA.sol";
+import "./utils/cryptography/EIP712.sol";
 
 abstract contract Reencrypt is EIP712 {
     constructor() EIP712("Authorization token", "1") {}

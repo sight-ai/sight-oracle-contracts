@@ -26,7 +26,6 @@ struct Request {
     address requester;
     Operation[] ops;
     uint256 opsCursor;
-    address oracleAddr;
     address callbackAddr;
     bytes4 callbackFunc;
     bytes payload;
@@ -37,7 +36,6 @@ struct ReencryptRequest {
     CapsulatedValue target;
     bytes32 publicKey;
     bytes signature;
-    address oracleAddr;
     address callbackAddr;
     bytes4 callbackFunc;
 }
@@ -46,7 +44,6 @@ struct SaveCiphertextRequest {
     address requester;
     bytes ciphertext;
     uint8 ciphertextType;
-    address oracleAddr;
     address callbackAddr;
     bytes4 callbackFunc;
 }
