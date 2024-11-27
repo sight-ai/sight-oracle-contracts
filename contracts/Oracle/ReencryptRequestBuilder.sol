@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { CapsulatedValue, ReencryptRequest } from "./Types.sol";
+import { CapsulatedValue, ReencryptRequest, Types, ebool, euint64, eaddress } from "./Types.sol";
+import { Oracle } from "./Oracle.sol";
 
 library ReencryptRequestBuilder {
     function newReencryptRequest(

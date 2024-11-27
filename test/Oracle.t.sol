@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import { Test, console, Vm } from "forge-std/Test.sol";
 import "../contracts/Oracle/Types.sol";
 import { Oracle } from "../contracts/Oracle/Oracle.sol";
+import { StorageACL } from "../contracts/Oracle/StorageACL.sol";
 import { CapsulatedValue, Request } from "../contracts/Oracle/Types.sol";
 import { RequestBuilder } from "../contracts/Oracle/RequestBuilder.sol";
 import { ResponseResolver } from "../contracts/Oracle/ResponseResolver.sol";
@@ -46,9 +47,12 @@ contract OracleTest is Test {
 
     function setUp() public {
         oracle = new Oracle();
+        StorageACL storageACL = new StorageACL();
+        storageACL.transferOwnership(address(oracle));
         address[] memory callers = new address[](1);
         callers[0] = address(this);
         oracle.addCallers(callers);
+        oracle.setStorageACL(address(storageACL));
         example = new UseCaseExample(address(oracle));
     }
 

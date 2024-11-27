@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import { ebool, euint64, eaddress, op, Request, Operation, Opcode } from "./Types.sol";
+import { Oracle } from "./Oracle.sol";
 
 library RequestBuilder {
     function newRequest(
