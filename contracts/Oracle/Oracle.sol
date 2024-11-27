@@ -7,10 +7,7 @@ import "./RequestBuilder.sol";
 import "./ReencryptRequestBuilder.sol";
 import "./SaveCiphertextRequestBuilder.sol";
 import "./access/Ownable2Step.sol";
-import "./constants/OracleAddresses.sol";
 import "./StorageACL.sol";
-
-Oracle constant oracleOpSepolia = Oracle(ORACLE_ADDR_OP_SEPOLIA);
 
 contract Oracle is Ownable2Step, Reencrypt {
     mapping(bytes32 => Request) requests;
