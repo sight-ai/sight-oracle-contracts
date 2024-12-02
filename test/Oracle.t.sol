@@ -7,8 +7,10 @@ import { Oracle } from "../contracts/Oracle/Oracle.sol";
 import { StorageACL } from "../contracts/Oracle/StorageACL.sol";
 import { CapsulatedValue, Request } from "../contracts/Oracle/Types.sol";
 import { RequestBuilder } from "../contracts/Oracle/RequestBuilder.sol";
-import { ResponseResolver } from "../contracts/Oracle/ResponseResolver.sol";
+import { CapsulatedValueResolver, ResponseResolver } from "../contracts/Oracle/CapsulatedValueResolver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+
+using CapsulatedValueResolver for euint64;
 
 contract UseCaseExample {
     using RequestBuilder for Request;
@@ -72,8 +74,8 @@ contract OracleTest is Test {
         requestId = example.singleRequest();
         console.log("singleRequest's id: %s", Strings.toHexString(uint256(requestId), 32));
         CapsulatedValue[] memory results = new CapsulatedValue[](1);
-        results[0] = CapsulatedValue(0, 129);
+        results[0] = CapsulatedValue(abi.encode(0), 129);
         oracle.callback(requestId, results);
-        assertEq(euint64.unwrap(example.myValue()), 0);
+        assertEq(abi.decode(example.myValue().asCapsulatedValue().data, (uint256)), 0);
     }
 }

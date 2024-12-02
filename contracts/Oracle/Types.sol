@@ -1,25 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-type ebool is uint256;
-type euint4 is uint256;
-type euint8 is uint256;
-type euint16 is uint256;
-type euint32 is uint256;
-type euint64 is uint256;
-type eaddress is uint256;
+type ebool is bytes32;
+type euint4 is bytes32;
+type euint8 is bytes32;
+type euint16 is bytes32;
+type euint32 is bytes32;
+type euint64 is bytes32;
+type eaddress is bytes32;
 
 type op is uint256;
 
+enum EType {
+    Zero,
+    Ebool,
+    Euint64,
+    Eaddress
+}
+
 struct CapsulatedValue {
-    uint256 data;
+    bytes data;
     uint8 valueType;
 }
 
 struct Operation {
     uint8 opcode;
-    uint256[] operands; // Indices of the operands within the request
-    uint64 value; // Direct value if applicable
+    CapsulatedValue[] operands;
 }
 
 struct Request {
@@ -120,14 +126,22 @@ library Opcode {
 
     uint8 internal constant eq = 59; // equal
     uint8 internal constant ne = 60; // not equal
+
+    uint8 internal constant save_ebool_bytes = 61;
+    uint8 internal constant save_euint64_bytes = 62;
+    uint8 internal constant save_eaddress_bytes = 63;
 }
 
 library Types {
     uint8 internal constant T_BOOL = 1;
     uint8 internal constant T_UINT64 = T_BOOL + 1;
     uint8 internal constant T_ADDRESS = T_BOOL + 2;
+    uint8 internal constant T_UINT256 = T_BOOL + 3;
 
     uint8 internal constant T_EBOOL = 128;
     uint8 internal constant T_EUINT64 = T_EBOOL + 1;
     uint8 internal constant T_EADDRESS = T_EBOOL + 2;
+    uint8 internal constant T_EBOOL_BYTES = T_EBOOL + 3;
+    uint8 internal constant T_EUINT64_BYTES = T_EBOOL + 4;
+    uint8 internal constant T_EADDRESS_BYTES = T_EBOOL + 5;
 }

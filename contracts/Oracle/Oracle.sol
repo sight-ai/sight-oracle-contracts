@@ -6,8 +6,11 @@ import "./Reencrypt.sol";
 import "./RequestBuilder.sol";
 import "./ReencryptRequestBuilder.sol";
 import "./SaveCiphertextRequestBuilder.sol";
+import "./CapsulatedValueResolver.sol";
 import "./access/Ownable2Step.sol";
 import "./StorageACL.sol";
+
+using ResponseResolver for CapsulatedValue;
 
 contract Oracle is Ownable2Step, Reencrypt {
     mapping(bytes32 => Request) requests;
@@ -23,7 +26,7 @@ contract Oracle is Ownable2Step, Reencrypt {
     event SaveCiphertextSent(bytes32 indexed reqId, SaveCiphertextRequest req);
     event SaveCiphertextCallback(bytes32 indexed reqId, bool indexed success);
 
-    string public constant VERSION = "0.0.3-release";
+    string public constant VERSION = "0.0.4-SNAPSHOT";
 
     uint256 private nonce;
     StorageACL public acl;
@@ -45,21 +48,25 @@ contract Oracle is Ownable2Step, Reencrypt {
         for (uint256 i; i < req.ops.length; i++) {
             if (req.ops[i].opcode == Opcode.get_ebool) {
                 require(
-                    acl.isAccessibleEbool(req.callbackAddr, ebool.wrap(req.ops[i].operands[0])),
+                    acl.isAccessible(req.callbackAddr, req.ops[i].operands[0].asBytes32()),
                     "callbackAddr not own ebool data"
                 );
             } else if (req.ops[i].opcode == Opcode.get_euint64) {
                 require(
-                    acl.isAccessibleEuint64(req.callbackAddr, euint64.wrap(req.ops[i].operands[0])),
+                    acl.isAccessible(req.callbackAddr, req.ops[i].operands[0].asBytes32()),
                     "callbackAddr not own euint64 data"
                 );
             } else if (req.ops[i].opcode == Opcode.get_eaddress) {
                 require(
-                    acl.isAccessibleEaddress(req.callbackAddr, eaddress.wrap(req.ops[i].operands[0])),
+                    acl.isAccessible(req.callbackAddr, req.ops[i].operands[0].asBytes32()),
                     "callbackAddr not own eaddress data"
                 );
             }
-            ops.push(req.ops[i]);
+            ops.push();
+            ops[i].opcode = req.ops[i].opcode;
+            for (uint256 j; j < req.ops[i].operands.length; j++) {
+                ops[i].operands.push(req.ops[i].operands[j]);
+            }
         }
         emit RequestSent(reqId, request);
         return reqId;
@@ -76,11 +83,17 @@ contract Oracle is Ownable2Step, Reencrypt {
         }
         for (uint i; i < result.length; i++) {
             if (result[i].valueType == Types.T_EBOOL) {
-                acl.setAccessibleEbool(req.callbackAddr, ebool.wrap(result[i].data), true);
+                bytes32 key = result[i].asBytes32();
+                acl.setAccessible(req.callbackAddr, key, true);
+                acl.setDataType(key, EType.Ebool);
             } else if (result[i].valueType == Types.T_EUINT64) {
-                acl.setAccessibleEuint64(req.callbackAddr, euint64.wrap(result[i].data), true);
+                bytes32 key = result[i].asBytes32();
+                acl.setAccessible(req.callbackAddr, key, true);
+                acl.setDataType(key, EType.Euint64);
             } else if (result[i].valueType == Types.T_EADDRESS) {
-                acl.setAccessibleEaddress(req.callbackAddr, eaddress.wrap(result[i].data), true);
+                bytes32 key = result[i].asBytes32();
+                acl.setAccessible(req.callbackAddr, key, true);
+                acl.setDataType(key, EType.Eaddress);
             }
         }
         emit RequestCallback(reqId, success);
@@ -97,20 +110,14 @@ contract Oracle is Ownable2Step, Reencrypt {
         bytes32 reqId = keccak256(abi.encodePacked(nonce++, req.requester, block.number));
 
         if (req.target.valueType == Types.T_EBOOL) {
-            require(
-                acl.isAccessibleEbool(req.callbackAddr, ebool.wrap(req.target.data)),
-                "callbackAddr not own ebool data"
-            );
+            bytes32 key = req.target.asBytes32();
+            require(acl.isAccessible(req.callbackAddr, key), "callbackAddr not own ebool data");
         } else if (req.target.valueType == Types.T_EUINT64) {
-            require(
-                acl.isAccessibleEuint64(req.callbackAddr, euint64.wrap(req.target.data)),
-                "callbackAddr not own euint64 data"
-            );
+            bytes32 key = req.target.asBytes32();
+            require(acl.isAccessible(req.callbackAddr, key), "callbackAddr not own euint64 data");
         } else if (req.target.valueType == Types.T_EADDRESS) {
-            require(
-                acl.isAccessibleEaddress(req.callbackAddr, eaddress.wrap(req.target.data)),
-                "callbackAddr not own eaddress data"
-            );
+            bytes32 key = req.target.asBytes32();
+            require(acl.isAccessible(req.callbackAddr, key), "callbackAddr not own eaddress data");
         }
         reenc_requests[reqId] = req;
         emit ReencryptSent(reqId, req);
@@ -149,11 +156,17 @@ contract Oracle is Ownable2Step, Reencrypt {
             revert(err);
         }
         if (result.valueType == Types.T_EBOOL) {
-            acl.setAccessibleEbool(req.callbackAddr, ebool.wrap(result.data), true);
+            bytes32 key = result.asBytes32();
+            acl.setAccessible(req.callbackAddr, key, true);
+            acl.setDataType(key, EType.Ebool);
         } else if (result.valueType == Types.T_EUINT64) {
-            acl.setAccessibleEuint64(req.callbackAddr, euint64.wrap(result.data), true);
+            bytes32 key = result.asBytes32();
+            acl.setAccessible(req.callbackAddr, key, true);
+            acl.setDataType(key, EType.Euint64);
         } else if (result.valueType == Types.T_EADDRESS) {
-            acl.setAccessibleEaddress(req.callbackAddr, eaddress.wrap(result.data), true);
+            bytes32 key = result.asBytes32();
+            acl.setAccessible(req.callbackAddr, key, true);
+            acl.setDataType(key, EType.Eaddress);
         }
         emit SaveCiphertextCallback(reqId, success);
     }
