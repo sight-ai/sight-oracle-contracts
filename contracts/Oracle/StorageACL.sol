@@ -7,12 +7,9 @@ import "./access/Ownable.sol";
 contract StorageACL is Ownable {
     mapping(address => mapping(address => bool)) allowed_callback_addr_records;
     mapping(address => address[]) allowed_callback_addrs;
-    mapping(ebool => mapping(address => bool)) ebool_acl;
-    mapping(ebool => address[]) ebool_acl_addrs;
-    mapping(euint64 => mapping(address => bool)) euint64_acl;
-    mapping(euint64 => address[]) euint64_acl_addrs;
-    mapping(eaddress => mapping(address => bool)) eaddress_acl;
-    mapping(eaddress => address[]) eaddress_acl_addrs;
+    mapping(bytes32 => EType) type_records;
+    mapping(bytes32 => address[]) value_owners;
+    mapping(address => bytes32[]) owner_values;
 
     function allowedCallbackAddr(address owner, address delegated) public view returns (bool) {
         return allowed_callback_addr_records[owner][delegated];
@@ -49,118 +46,77 @@ contract StorageACL is Ownable {
         }
     }
 
-    function isAccessibleEbool(address requester, ebool data) public view returns (bool) {
-        return ebool_acl[data][requester];
-    }
-
-    function isAccessibleEuint64(address requester, euint64 data) public view returns (bool) {
-        return euint64_acl[data][requester];
-    }
-
-    function isAccessibleEaddress(address requester, eaddress data) public view returns (bool) {
-        return eaddress_acl[data][requester];
-    }
-
-    function setAccessibleEbool(address requester, ebool data, bool enable) public {
+    function setDataType(bytes32 data, EType eType) public {
         require(
-            owner() == msg.sender || ebool_acl[data][msg.sender],
+            owner() == msg.sender || isAccessible(msg.sender, data),
             "msg.sender was neither storage owner nor data owner"
         );
-        if (enable) {
-            if (!isAccessibleEbool(requester, data)) {
-                ebool_acl[data][requester] = true;
-                ebool_acl_addrs[data].push(requester);
-            }
-        } else {
-            if (isAccessibleEbool(requester, data)) {
-                ebool_acl[data][requester] = false;
-                uint length = ebool_acl_addrs[data].length;
-                uint j;
-                for (uint i; i < length; i++) {
-                    if (requester != ebool_acl_addrs[data][i]) {
-                        ebool_acl_addrs[data][j] = ebool_acl_addrs[data][i];
-                        j++;
-                    }
-                }
-                for (uint k; k < length - j; k++) {
-                    ebool_acl_addrs[data].pop();
-                }
-            }
+        type_records[data] = eType;
+    }
+
+    function getDataType(bytes32 data) public view returns (EType) {
+        require(type_records[data] != EType.Zero, "data not exists");
+        return type_records[data];
+    }
+
+    function isAccessible(address requester, bytes32 data) public view returns (bool) {
+        address[] memory owners = value_owners[data];
+        for (uint i; i < owners.length; i++) {
+            if (owners[i] == requester) return true;
         }
+        return false;
     }
 
-    function setAccessibleEuint64(address requester, euint64 data, bool enable) public {
+    function setAccessible(address requester, bytes32 data, bool enable) public {
         require(
-            owner() == msg.sender || euint64_acl[data][msg.sender],
+            owner() == msg.sender || isAccessible(msg.sender, data),
             "msg.sender was neither storage owner nor data owner"
         );
         if (enable) {
-            if (!isAccessibleEuint64(requester, data)) {
-                euint64_acl[data][requester] = true;
-                euint64_acl_addrs[data].push(requester);
+            if (!isAccessible(requester, data)) {
+                value_owners[data].push(requester);
+                owner_values[requester].push(data);
             }
         } else {
-            if (isAccessibleEuint64(requester, data)) {
-                euint64_acl[data][requester] = false;
-                uint length = euint64_acl_addrs[data].length;
-
+            if (isAccessible(requester, data)) {
+                uint length = value_owners[data].length;
                 uint i;
                 uint j = length - 1;
                 while (i <= j) {
-                    if (euint64_acl_addrs[data][i] == requester) {
-                        euint64_acl_addrs[data][i] = euint64_acl_addrs[data][j];
+                    if (value_owners[data][i] == requester) {
+                        value_owners[data][i] = value_owners[data][j];
                         j--;
                     } else {
                         i++;
                     }
                 }
                 for (uint k; k < length - i; k++) {
-                    euint64_acl_addrs[data].pop();
+                    value_owners[data].pop();
                 }
-            }
-        }
-    }
 
-    function setAccessibleEaddress(address requester, eaddress data, bool enable) public {
-        require(
-            owner() == msg.sender || eaddress_acl[data][msg.sender],
-            "msg.sender was neither storage owner nor data owner"
-        );
-        if (enable) {
-            if (!isAccessibleEaddress(requester, data)) {
-                eaddress_acl[data][requester] = true;
-                eaddress_acl_addrs[data].push(requester);
-            }
-        } else {
-            if (isAccessibleEaddress(requester, data)) {
-                eaddress_acl[data][requester] = false;
-                uint length = eaddress_acl_addrs[data].length;
-                uint len = eaddress_acl_addrs[data].length;
-                for (uint i; i < len; i++) {
-                    if (requester == eaddress_acl_addrs[data][i]) {
-                        for (uint j = i + 1; j < len; j++) {
-                            eaddress_acl_addrs[data][j - 1] = eaddress_acl_addrs[data][j];
-                        }
-                        i--;
-                        len--;
+                length = value_owners[data].length;
+                i = 0;
+                j = length - 1;
+                while (i <= j) {
+                    if (owner_values[requester][i] == data) {
+                        owner_values[requester][i] = owner_values[requester][j];
+                        j--;
+                    } else {
+                        i++;
                     }
                 }
-                for (uint k; k < length - len; k++) {
-                    eaddress_acl_addrs[data].pop();
+                for (uint k; k < length - i; k++) {
+                    owner_values[requester].pop();
                 }
             }
         }
     }
 
-    function getEboolOwners(ebool data) public view returns (address[] memory) {
-        return ebool_acl_addrs[data];
+    function getValueOwners(bytes32 value) public view returns (address[] memory) {
+        return value_owners[value];
     }
 
-    function getEuint64Owners(euint64 data) public view returns (address[] memory) {
-        return euint64_acl_addrs[data];
-    }
-
-    function getEaddressOwners(eaddress data) public view returns (address[] memory) {
-        return eaddress_acl_addrs[data];
+    function getOwnerValues(address owner) public view returns (bytes32[] memory) {
+        return owner_values[owner];
     }
 }
