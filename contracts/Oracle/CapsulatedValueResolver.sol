@@ -38,10 +38,22 @@ library ResponseResolver {
         require(
             capsulatedValue.valueType == Types.T_EBOOL ||
                 capsulatedValue.valueType == Types.T_EUINT64 ||
-                capsulatedValue.valueType == Types.T_EADDRESS,
+                capsulatedValue.valueType == Types.T_EADDRESS ||
+                capsulatedValue.valueType == Types.T_BYTES32,
             "Invalid valueType for Bytes32"
         );
         return abi.decode(capsulatedValue.data, (bytes32));
+    }
+
+    function asBytes(CapsulatedValue memory capsulatedValue) internal pure returns (bytes memory) {
+        require(
+            capsulatedValue.valueType == Types.T_EBOOL_BYTES ||
+                capsulatedValue.valueType == Types.T_EUINT64_BYTES ||
+                capsulatedValue.valueType == Types.T_EADDRESS_BYTES ||
+                capsulatedValue.valueType == Types.T_BYTES,
+            "Invalid valueType for Bytes"
+        );
+        return capsulatedValue.data;
     }
 }
 
@@ -60,6 +72,14 @@ library CapsulatedValueResolver {
 
     function asCapsulatedValue(address addr) internal pure returns (CapsulatedValue memory) {
         return CapsulatedValue(abi.encode(addr), Types.T_ADDRESS);
+    }
+
+    function asCapsulatedValue(bytes32 b32) internal pure returns (CapsulatedValue memory) {
+        return CapsulatedValue(abi.encode(b32), Types.T_BYTES32);
+    }
+
+    function asCapsulatedValue(bytes memory b) internal pure returns (CapsulatedValue memory) {
+        return CapsulatedValue(b, Types.T_BYTES);
     }
 
     function asCapsulatedValue(ebool eb) internal pure returns (CapsulatedValue memory) {

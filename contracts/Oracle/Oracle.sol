@@ -61,6 +61,12 @@ contract Oracle is Ownable2Step, Reencrypt {
                     acl.isAccessible(req.callbackAddr, req.ops[i].operands[0].asBytes32()),
                     "callbackAddr not own eaddress data"
                 );
+            } else if (req.ops[i].opcode == Opcode.reencrypt) {
+                bytes32 digest = _hashTypedDataV4(
+                    keccak256(abi.encode(keccak256("Reencrypt(bytes32 publicKey)"), req.ops[i].operands[1].asBytes32()))
+                );
+                address signer = ECDSA.recover(digest, req.ops[i].operands[2].asBytes());
+                require(signer == tx.origin, "EIP712 signer and transaction signer do not match");
             }
             ops.push();
             ops[i].opcode = req.ops[i].opcode;
