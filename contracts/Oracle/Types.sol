@@ -130,6 +130,8 @@ library Opcode {
     uint8 internal constant save_ebool_bytes = 61;
     uint8 internal constant save_euint64_bytes = 62;
     uint8 internal constant save_eaddress_bytes = 63;
+
+    uint8 internal constant reencrypt = 64;
 }
 
 library Types {
@@ -137,6 +139,8 @@ library Types {
     uint8 internal constant T_UINT64 = T_BOOL + 1;
     uint8 internal constant T_ADDRESS = T_BOOL + 2;
     uint8 internal constant T_UINT256 = T_BOOL + 3;
+    uint8 internal constant T_BYTES32 = T_BOOL + 4;
+    uint8 internal constant T_BYTES = T_BOOL + 5;
 
     uint8 internal constant T_EBOOL = 128;
     uint8 internal constant T_EUINT64 = T_EBOOL + 1;

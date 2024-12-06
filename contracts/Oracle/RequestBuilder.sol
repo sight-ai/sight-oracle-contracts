@@ -828,4 +828,23 @@ library RequestBuilder {
 
         return op.wrap(r.opsCursor - 1);
     }
+
+    // reencrypt(ebool_idx, value1, value2)
+    function reencrypt(
+        Request memory r,
+        op eIndex,
+        bytes32 publicKey,
+        bytes memory signature
+    ) internal pure returns (op) {
+        require(r.opsCursor < r.ops.length, "Operations array is full");
+        Operation memory _op = Operation({ opcode: Opcode.reencrypt, operands: new CapsulatedValue[](3) });
+        _op.operands[0] = eIndex.asCapsulatedValue();
+        _op.operands[1] = publicKey.asCapsulatedValue();
+        _op.operands[2] = signature.asCapsulatedValue();
+
+        r.ops[r.opsCursor] = _op;
+        r.opsCursor += 1;
+
+        return op.wrap(r.opsCursor - 1);
+    }
 }
